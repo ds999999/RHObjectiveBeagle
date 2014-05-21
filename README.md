@@ -29,7 +29,7 @@ It does this by hunting through the heap, looking for things that smell like obj
 If you just read the above block, you might be a little worried that Beagle is going to be hard to use.
 Don't worry, it's super easy and has even has shorthand to save you from having to type.
 
-### beagle() (AKA beagle_getInstancesOfClass)
+### beagle (AKA beagle_getInstancesOfClass)
 `beagle()` is the main interface to Objective Beagle, and it also exposes some useful class search helpers.
 If you can only remember a single function, make it this one! 
 
