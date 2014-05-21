@@ -461,16 +461,22 @@ NSArray * _RHBeagleFindInstancesOfClassWithOptionsInternal(Class class, RHBeagle
 static BOOL _RHBeagleIsKnownUnsafeClass(Class aClass) {
     NSString *className = NSStringFromClass(aClass);
     
-    if ([@"NSPlaceholderString" isEqualToString:className]) return YES;
-    if ([@"__NSPlaceholderArray" isEqualToString:className]) return YES;
-    if ([@"NSPlaceholderValue" isEqualToString:className]) return YES;
+    if ([@"_NSZombie_" isEqualToString:className]) return YES;
     if ([@"__ARCLite__" isEqualToString:className]) return YES;
+    if ([@"__NSCFCalendar" isEqualToString:className]) return YES;
+    if ([@"__NSCFTimer" isEqualToString:className]) return YES;
+    if ([@"NSCFTimer" isEqualToString:className]) return YES;
     if ([@"__NSMessageBuilder" isEqualToString:className]) return YES;
     if ([@"__NSGenericDeallocHandler" isEqualToString:className]) return YES;
+    if ([@"NSAutoreleasePool" isEqualToString:className]) return YES;
+    if ([@"NSPlaceholderNumber" isEqualToString:className]) return YES;
+    if ([@"NSPlaceholderString" isEqualToString:className]) return YES;
+    if ([@"NSPlaceholderValue" isEqualToString:className]) return YES;
     if ([@"Object" isEqualToString:className]) return YES;
-    if ([@"_NSZombie_" isEqualToString:className]) return YES;
-    
-    
+    if ([@"NSPlaceholderNumber" isEqualToString:className]) return YES;
+    if ([@"VMUArchitecture" isEqualToString:className]) return YES;
+    if ([className hasPrefix:@"__NSPlaceholder"]) return YES;
+
     return NO;
 }
 
