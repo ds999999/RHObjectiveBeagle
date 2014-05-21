@@ -41,6 +41,10 @@
 
 #import <Foundation/Foundation.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // ---------------------------------------------------------
 // Objective Beagle
 
@@ -111,6 +115,10 @@ extern NSArray * RHBeagleGetClassesWithNameAndOptions(NSString *partialName, NSS
 - (id)beagle_shortMethodDescription;
 
 @end
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //end RH_OBJECTIVE_BEAGLE_H
 
