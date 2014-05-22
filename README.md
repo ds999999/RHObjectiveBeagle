@@ -1,37 +1,35 @@
 # Objective Beagle
-Beagle is an Objective C debugging aid that sniffs out instances of a specified class. 
-It does this by hunting through the heap, looking for things that smell like object instances.
- For more info see [How Beagle Works](#how).
+Beagle is an Objective C debugging aid that sniffs out instances of a specified class in your running process. It does this by hunting through the heap, looking for things that look and feel like object instances.
+
+For more info see [How Beagle Works](#how).
 
 
 
 ## What can Beagle do for me?
-* Get all instances of a class and it's subclasses.
-* Get all instances of a specified class.
-* Get the first instance of a specific class.
+* List all instances of a class and it's subclasses.
+* List all instances of a specified (exact) class.
+* Find the first instance of a specific class.
 * Lookup and list all the subclasses of a specific class.
 
 
 
 ## <a name="how"></a>How does Beagle work?
 * First, Beagle iterates through all "pointer in use" malloc zone ranges in the process (aka the heap).
-* For each range, Beagle then grabs the first 4 or 8 bytes (arch pointer size) of the range and casts it to a pointer.
-* If the platform uses tagged isa pointers, this pointer is then massaged to remove any possible isa taggedness.
+* For each range, Beagle then grabs the first 4 or 8 bytes (depending on architecture pointer size) of the range and casts it to a pointer.
+* If the platform uses [non-pointer isa](http://www.sealiesoftware.com/blog/archive/2013/09/24/objc_explain_Non-pointer_isa.html)(currently only arm64), this 'isa' pointer is then massaged to remove any possible taggedness.
 * Beagle then compares this pointer to a list of known class isa pointers.
 * If the pointer matches a known class, we then grab the matching classes required instance size and then round it up to the nearest malloc allocation size.
 * Finally, we compare this rounded size to the size of the malloc zone range.
-* If they match, Beagle treats it as a valid instance and it's added to the result set.
+* If they match, Beagle treats it as a valid object instance and it's added to the result set.
 * Woof!
 
 
 
 ## Beagle is really easy to use
-If you just read the above block, you might be a little worried that Beagle is going to be hard to use.
-Don't worry, it's super easy and has even has shorthand to save you from having to type.
+If you just read the above block, you might be a little worried that Beagle is going to be hard to use. Don't worry however, as it's super easy to use. It even has shorthand to save you from typing.
 
 ### beagle (AKA beagle_getInstancesOfClass)
-`beagle()` is the main interface to Objective Beagle, and it also exposes some useful class search helpers.
-If you can only remember a single function, make it this one! 
+`beagle()` is the main interface to Objective Beagle, and it also exposes some useful class search helpers. If you can only remember a single function, make it this one! 
 
 ```
 (lldb) po beagle(@"UISwitch")
@@ -86,7 +84,7 @@ nil
 ```
 
 ### beagle_classes (AKA beagle_getClassesWithPrefix)
-You can use `beagle_classes()` to quickly locate interesting classes with a given name prefix. If you want to be more specific with search patterns, check out `RHBeagleGetClassesWithNameAndOptions()`.
+You can use `beagle_classes()` to search for interesting classes with a given name prefix. If you want to be more specific with search patterns, check out `RHBeagleGetClassesWithNameAndOptions()`.
 
 ```
 (lldb) po beagle_classes(@"OB")
@@ -122,8 +120,8 @@ UITableViewCellDeleteConfirmationButton,
 ```
 
 ### NSObject category
-Beagle also adds some methods onto NSObjects, all prefixed with `beagle_`.
-These operate in the same way as the above method defs.
+Beagle also adds some methods to NSObject, all prefixed with `beagle_`.
+These operate in the same way as the above method definitions.
 
 ```
 @interface NSObject (RHBeagleAdditions)
@@ -137,15 +135,17 @@ These operate in the same way as the above method defs.
 ```
 
 
-## Adding Beagle to your project.
-The easiest way to add Beagle to your project is going to be adding `RHObjectiveBeagle.h` and `RHObjectiveBeagle.m` to your project. You can also find it on CocoaPods.
+## Adding Beagle to your project
+The easiest way to add Beagle to your project will likely be by adding `RHObjectiveBeagle.h` and `RHObjectiveBeagle.m` to your project.
+
+To include Beagle via CocoaPods add `pod 'RHObjectiveBeagle', :git => 'https://github.com/heardrwt/RHObjectiveBeagle.git'` to your Podfile.
 
 
 ## Use it for debugging purposes only
 Beagle is debugging tool and therefore is only meant to be used for debugging.  
 If you need to debug a production build, you can always [load](#load) libBeagle.dylib into the process at runtime.
 
-* It's likely not a good idea to ship it in your production builds.
+* It's probably not a good idea to ship it in your production builds.
 * Please don't write code that uses it explicitly.
 * **Whatever you do, NEVER use it in place of a singleton!**
 
@@ -196,11 +196,12 @@ extern NSArray * beagle_getSubclassesOfClass(Class aClass);     // fetch a class
 
 
 ## <a name="load"></a>Loading libBeagle.dylib into an existing process
-Also known as, you're debugging a production build and you want to use Beagle to find instances etc.
-Well the news is good. It's easy to do and should only a few steps!
-First you need to locate the apropriate libBeagle.dylib. (For iOS targets, you will need `libBeagle-ios.dylib`)
+Also known as: You're debugging a production build and you want to use Beagle to find instances etc.
 
-You can likely just use the prebuild dylib files that are checked into this repo in the `libBeagle` folder.
+Well the news is good. It's easy to do and should only take a few steps!
+First you'll need to locate the appropriate libBeagle.dylib. (For iOS targets, you will need `libBeagle-ios.dylib`.) You can likely just use the pre-built dylib files that are checked into this repo in the `libBeagle` folder.
+
+Next, run the below command while attached in lldb.
 
 ```
 (lldb) expr (void*)dlopen("/path/to/libBeagle.dylib", 0x2);
@@ -209,7 +210,7 @@ You can likely just use the prebuild dylib files that are checked into this repo
 ```
 
 #### Not working? Check for errors
-if dlopen returns 0x00000000, an error occured. You can print a human readable error using the below command.
+if dlopen returns 0x00000000, an error occurred. You can print a human readable error using the below command.
 
 ```
 (lldb) p (char*)dlerror()
@@ -219,16 +220,15 @@ if dlopen returns 0x00000000, an error occured. You can print a human readable e
 
 #### Sandboxed app considerations
 Be aware that if your application is sandboxed, the dylib must be inside your apps sandbox. 
-
 The error above was caused by open() failing, due to sandbox restrictions.
-For OS X apps, the easiest way around the sandbox is to place a copy of libBeagle.dylib inside your apps sandbox container. The same should be true on iOS using your apps documents directory exposed by iTunes.
+
+For OS X apps, the easiest way around the sandbox is to place a copy of libBeagle.dylib inside your apps sandbox container. The same should be true on iOS using your apps documents directory exposed via iTunes.
 
 ```
 cp libBeagle.dylib ~/Library/Containers/<app.bundle.id>/Data/
 ```
 
-## Building libBeagle.dylib && libBeagle-ios.dylib
-### libBeagle-ios.dylib specific considerations
+## Building libBeagle-ios.dylib
 Xcode by default will refuse to build libBeagle-ios.dylib with the below error.
 
 ```
@@ -237,7 +237,7 @@ Target specifies product type 'com.apple.product-type.library.dynamic', but ther
 ```
 To fix this error, we have to manually edit some Xcode files to add the dynamic library product type. See [here](http://stackoverflow.com/questions/12549633/xcode-4-5-no-com-apple-product-type-application-product-type-for-iphoneos), [here](http://realmacsoftware.com/blog/dynamic-linking) or the `libBeagle` folder for more info.
 
-Also, note that libBeagle-ios is actualy lipo'd together from -iphoneos and -iphonesimulator targets.
+Also, note that libBeagle-ios is actually lipo'd together from the -iphoneos and -iphonesimulator targets.
 
 ## Licence
 Released under the Modified BSD License. 
@@ -273,22 +273,22 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ### Version Support
-Beagle has been tested on iOS 7 and OS X 10.9 and it supports all current system archetectures including arm64. It should work fine on older systems too. 
+Beagle has been tested on iOS 7 and OS X 10.9 and it should support all currently used system architectures (including arm64). Beagle should also work fine with older OS versions.
 
 
 
 ### Things that might be nice to have in the future (AKA todo)
 * Better support for partial class name matches.
 * The ability to exclude all known system classes.
-* Filtering instances, based on various properties.
+* Filtering instances, based on various properties. (ie valueForKey:)
 
 
 ## Who created Beagle?
 Beagle is the creation of Richard Heard, a Mac + iOS developer based in San Francisco.
 
-I'm currently working at [Atlas Cove](http://) and i've previously worked at [Apple](http://apple.com), [DailyBooth](http://en.wikipedia.org/wiki/DailyBooth), [Batch](http://techcrunch.com/2012/07/24/airbnb-brian-pokorny-batch-dailybooth/) & [AirBnB](http://airbnb.com). 
+I'm currently working at [Atlas Cove](http://atlas.co.ve) and i've previously worked at [Apple](http://apple.com), [DailyBooth](http://en.wikipedia.org/wiki/DailyBooth), [Batch](http://techcrunch.com/2012/07/24/airbnb-brian-pokorny-batch-dailybooth/) & [AirBnB](http://airbnb.com). 
 
-From time to time i take on contract work and would be happy to talk about my availability / project requirements etc. 
+From time to time I take on contract work and would be happy to talk about my availability / project requirements etc. 
 
 
 Finally, you can find me on [Twitter](http://twitter.com/heardrwt)!

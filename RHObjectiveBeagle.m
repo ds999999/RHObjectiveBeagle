@@ -75,7 +75,7 @@
 #ifndef RH_OBJECTIVE_BEAGLE_M
 #define RH_OBJECTIVE_BEAGLE_M 1
 
-#pragma mark - internal - defs
+#pragma mark - internal - defines
 
 #define OPTION_ENABLED(options, option) ((options & option) == option)
 #define ROUND_TO_MULTIPLE(num, multiple) ((num) && (multiple) ? (num) + (multiple) - 1 - ((num) - 1) % (multiple) : 0)
@@ -369,7 +369,7 @@ static void _RHZoneIntrospectionEnumeratorFindInstancesCallback(task_t task, voi
         //malloc operates as per: http://www.cocoawithlove.com/2010/05/look-at-how-malloc-works-on-mac.html
         //therefore we need to round needed size to nearest quantum allocation size before comparing it to the ranges size
         
-        //these next defs are from the last known malloc source: https://www.opensource.apple.com/source/Libc/Libc-825.40.1/gen/magazine_malloc.c (10.8.5) ( See : http://openradar.io/15365352 )
+        //these next defines are from the last known malloc source: https://www.opensource.apple.com/source/Libc/Libc-825.40.1/gen/magazine_malloc.c (10.8.5) ( See : http://openradar.io/15365352 )
 #define SHIFT_TINY_QUANTUM      4 // Required for AltiVec
 #define	TINY_QUANTUM           (1 << SHIFT_TINY_QUANTUM)
         
@@ -496,7 +496,7 @@ static Class _RHBeagleClassFromString(NSString *className) {
             return nil;
         }
 
-        //psudo fuzzy mistyped class matching for longer class names
+        //pseudo fuzzy mistyped class matching for longer class names
         NSString *fuzzyClassName = className;
         if (classNameLength > CLASS_FUZZY_SEARCH_THRESHOLD){
             fuzzyClassName = [fuzzyClassName substringWithRange:NSMakeRange(CLASS_SEARCH_THRESHOLD, classNameLength - (2 * CLASS_SEARCH_THRESHOLD))];
