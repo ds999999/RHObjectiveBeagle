@@ -44,6 +44,7 @@
 #include <objc/runtime.h>
 #include <malloc/malloc.h>
 #include <mach/mach.h>
+#include <sys/sysctl.h>
 
 
 #pragma mark internal - arc support
@@ -83,6 +84,7 @@
 
 static kern_return_t RHReadMemory(task_t task, vm_address_t remote_address, vm_size_t size, void **local_memory);
 static void _RHZoneIntrospectionEnumeratorFindInstancesCallback(task_t task, void *baton, unsigned type, vm_range_t *ranges, unsigned count);
+static size_t _RHBeagleSizeRoundedToNearestMallocRangeAllocationSize(size_t size);
 extern NSArray * _RHBeagleFindInstancesOfClassWithOptionsInternal(Class aClass, RHBeagleFindOptions options);
 static BOOL _RHBeagleIsKnownUnsafeClass(Class aClass);
 static Class _RHBeagleClassFromString(NSString *className);
@@ -362,33 +364,12 @@ static void _RHZoneIntrospectionEnumeratorFindInstancesCallback(task_t task, voi
 
         
         //sanity check the zone size, making sure that it's the correct size for the classes instance size
-        size_t needed = class_getInstanceSize(matchedClass);
-        
         //malloc operates as per: http://www.cocoawithlove.com/2010/05/look-at-how-malloc-works-on-mac.html
         //therefore we need to round needed size to nearest quantum allocation size before comparing it to the ranges size
-        
-        //these next defines are from the last known malloc source: https://www.opensource.apple.com/source/Libc/Libc-825.40.1/gen/magazine_malloc.c (10.8.5) ( See : http://openradar.io/15365352 )
-#define SHIFT_TINY_QUANTUM      4 // Required for AltiVec
-#define	TINY_QUANTUM           (1 << SHIFT_TINY_QUANTUM)
-        
-#ifdef __LP64__
-#define NUM_TINY_SLOTS          64	// number of slots for free-lists
-#else
-#define NUM_TINY_SLOTS          32	// number of slots for free-lists
-#endif
-        
-        //this next one is extracted from inlined logic spread throughout scalable_malloc.c (think tiny)
-#define SMALL_THRESHOLD            ((NUM_TINY_SLOTS - 1) * TINY_QUANTUM)
-        
-        //tiny; 16 bytes allocation
-        if (needed <= SMALL_THRESHOLD){
-            size_t rounded = ROUND_TO_MULTIPLE(needed, 16);
-            if (rounded != size) continue;
-        } else {
-            //small; 512 bytes allocation (we ignore large allocations)
-            size_t rounded = ROUND_TO_MULTIPLE(needed, 512);
-            if (rounded != size) continue;
-        }
+
+        size_t rounded = _RHBeagleSizeRoundedToNearestMallocRangeAllocationSize(class_getInstanceSize(matchedClass));
+        if (rounded != size) continue;
+
         
         //if LastMatch; remove any previously added results (Not exactly optimal.. )
         if (OPTION_ENABLED(context->options, RHBeagleFindOptionLastMatch)){
@@ -407,6 +388,52 @@ static void _RHZoneIntrospectionEnumeratorFindInstancesCallback(task_t task, voi
     }
 }
 
+static size_t _RHBeagleSizeRoundedToNearestMallocRangeAllocationSize(size_t size) {
+    
+    //these next defines are from the last known malloc source: https://www.opensource.apple.com/source/Libc/Libc-825.40.1/gen/magazine_malloc.c (10.8.5) ( See : http://openradar.io/15365352 )
+#define SHIFT_TINY_QUANTUM      4 // Required for AltiVec
+#define	TINY_QUANTUM           (1 << SHIFT_TINY_QUANTUM)
+    
+#ifdef __LP64__
+#define NUM_TINY_SLOTS          64	// number of slots for free-lists
+#else
+#define NUM_TINY_SLOTS          32	// number of slots for free-lists
+#endif
+    
+    //these next ones are extracted from inlined logic spread throughout magazine_malloc.c (think tiny)
+#define SMALL_THRESHOLD            ((NUM_TINY_SLOTS - 1) * TINY_QUANTUM)
+#define LARGE_THRESHOLD			 (15 * 1024)
+#define LARGE_THRESHOLD_LARGEMEM	(127 * 1024) //if greater than 1GB of ram, large uses this define
+    
+    
+    static size_t _largeThreshold = LARGE_THRESHOLD;
+    
+    static dispatch_once_t _largeThresholdOnceToken;
+    dispatch_once(&_largeThresholdOnceToken, ^{
+        
+        uint64_t	memsize = 0;
+        size_t	uint64_t_size = sizeof(memsize);
+        sysctlbyname("hw.memsize", &memsize, &uint64_t_size, 0, 0);
+        
+        if (memsize >= (1024*1024*1024)) {
+            _largeThreshold = LARGE_THRESHOLD_LARGEMEM;
+        }
+        
+    });
+    
+    
+    if (size <= SMALL_THRESHOLD){
+        //tiny; 16 bytes allocation
+        return ROUND_TO_MULTIPLE(size, 16);
+    } else if (size <= _largeThreshold){
+        //small; 512 bytes allocation
+        return ROUND_TO_MULTIPLE(size, 512);
+    }
+    
+    //large; 4096 bytes allocation
+    return ROUND_TO_MULTIPLE(size, 4096);
+    
+}
 
 NSArray * _RHBeagleFindInstancesOfClassWithOptionsInternal(Class class, RHBeagleFindOptions options) {
     
