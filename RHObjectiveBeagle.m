@@ -280,10 +280,8 @@ static kern_return_t RHReadMemory(task_t task, vm_address_t remote_address, vm_s
     return KERN_SUCCESS;
 }
 
-typedef struct _RHObjectStandin {
-    Class isa;
-} RHObjectStandin;
-
+@interface _RHObjectStandin : NSObject @end
+@implementation _RHObjectStandin @end
 
 #pragma mark - internal - callback
 static void _RHZoneIntrospectionEnumeratorFindInstancesCallback(task_t task, void *baton, unsigned type, vm_range_t *ranges, unsigned count) {
@@ -300,8 +298,8 @@ static void _RHZoneIntrospectionEnumeratorFindInstancesCallback(task_t task, voi
         void *data = (void *)range->address;
         size_t size = range->size;
         
-        //make sure range is big enough to contain an "object" sized pointer
-        if (size < sizeof(RHObjectStandin)){
+        //make sure range is big enough to contain an an instance of an object
+        if (size < sizeof(class_getInstanceSize([_RHObjectStandin class]))){
             continue;
         }
         
