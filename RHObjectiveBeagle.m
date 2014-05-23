@@ -270,7 +270,7 @@ typedef struct _RHBeagleFindContext {
     CFArrayRef subclasses;
     CFMutableArrayRef results;
     NSUInteger options;
-    BOOL canceled; //atm, only used in conjunction with option first
+    BOOL canceled; //atm, only used in conjunction with option RHBeagleFindOptionFirstMatch
 } RHBeagleFindContext;
 typedef RHBeagleFindContext* RHBeagleFindContextRef;
 
