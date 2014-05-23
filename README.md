@@ -228,6 +228,26 @@ For OS X apps, the easiest way around the sandbox is to place a copy of libBeagl
 cp libBeagle.dylib ~/Library/Containers/<app.bundle.id>/Data/
 ```
 
+## Inspiration, credits & similar projects
+The initial usefulness of such a debugging aid was brought to my attention by [Cycript](http://www.cycript.org) while debugging 3rd party applications earlier in 2014.
+  
+Initial research into how to implement such a feature came from [heap_find.c](http://llvm.org/viewvc/llvm-project/lldb/trunk/examples/darwin/heap_find/heap_find.c?view=markup&pathrev=148523) and via way of other similar implementations including [Cycript](http://www.cycript.org) and the [lldb-commits](http://lists.cs.uiuc.edu/pipermail/lldb-commits/Week-of-Mon-20120116/004775.html) mailing list.
+
+Specific class sanity checks were inspired by similar class instance checks found in [Cycript.org](http://gitweb.saurik.com/cycript.git/blob/HEAD:/ObjectiveC/Library.mm) and [heap_find.c](http://llvm.org/viewvc/llvm-project/lldb/trunk/examples/darwin/heap_find/heap_find.c?view=markup&pathrev=148523).
+
+Cycript itself is a really powerful debugging aid and deserves mention both as a source of inspiration and for all the amazing things that it's capable of doing. It makes use of [Webkit's JSC](https://trac.webkit.org/wiki/JSC) and allows for direct runtime introspection of a running application via a JavaScript console. Cycript by [saurik](https://twitter.com/saurik) can be found at [cycript.org](http://www.cycript.org).
+
+Inspiration also comes via way of a useful lldb [heap search feature](https://github.com/llvm-mirror/lldb/blob/master/examples/darwin/heap_find/heap/heap_find.cpp) implemented by the lldb project  for strings and other various objects and exposed via the lldb script 'lldb.macosx.heap' available via `command script import lldb.macosx.heap` and `ptr_refs --help`.
+
+Finally, other various sources of information include:
+
+* [Mac OS X Internals](http://books.google.com/books?id=K8vUkpOXhN4C&pg=PA972&lpg=PA972&dq=MALLOC_PTR_IN_USE_RANGE_TYPE&source=bl&ots=OLhfT_Yv0C&sig=vgdZVfNjrAM9e3tMtADOTGzzVRo&hl=en&sa=X&ei=B795U8DXM6zjsATimoIw&ved=0CEgQ6AEwBg#v=onepage&q=MALLOC_PTR_IN_USE_RANGE_TYPE&f=false)
+* [Mike Ash](https://www.mikeash.com/pyblog/friday-qa-2013-09-27-arm64-and-you.html)
+* [Greg Parker](http://www.sealiesoftware.com/blog/archive/2013/09/24/objc_explain_Non-pointer_isa.html)
+* [magazine_malloc.c](https://www.opensource.apple.com/source/Libc/Libc-825.40.1/gen/magazine_malloc.c)
+* [Cocoa With Love](http://www.cocoawithlove.com/2010/05/look-at-how-malloc-works-on-mac.html)
+
+
 ## Building libBeagle-ios.dylib
 Xcode by default will refuse to build libBeagle-ios.dylib with the below error.
 
