@@ -295,7 +295,6 @@ static void _RHZoneIntrospectionEnumeratorFindInstancesCallback(task_t task, voi
     for (unsigned i = 0; i < count; i++) {
         vm_range_t *range =  &ranges[i];
         
-        void *data = (void *)range->address;
         size_t size = range->size;
         
         //make sure range is big enough to contain an an instance of an object
@@ -303,7 +302,8 @@ static void _RHZoneIntrospectionEnumeratorFindInstancesCallback(task_t task, voi
             continue;
         }
         
-        uintptr_t *pointers = (uintptr_t *)data;
+        //assume that ivars are pointer sized, allowing us to index into ivar territory
+        uintptr_t *ivarPointers = (uintptr_t *)range->address;
         
 #if defined(__arm64__)
         //MAGIC: for arm64 tagged isa pointers : (http://www.sealiesoftware.com/blog/archive/2013/09/24/objc_explain_Non-pointer_isa.html)
@@ -318,11 +318,11 @@ static void _RHZoneIntrospectionEnumeratorFindInstancesCallback(task_t task, voi
             taggedPointerMask = objc_debug_isa_class_mask;
         }
         
-        void * isa = (void *)(pointers[0] & taggedPointerMask);
+        void * isa = (void *)(ivarPointers[0] & taggedPointerMask);
 
 #elif (defined(__i386__) || defined(__x86_64__) || defined(__arm__))
         //regular stuff, on these known arcs.
-        void * isa = (void *)pointers[0];
+        void * isa = (void *)ivarPointers[0];
 #else
         //unknown arch. we need to be updated depending on whether or not the arch uses tagged isa pointers
 #error Unknown architecture. We don't know if tagged isa pointers are used, therefore we can't continue.
@@ -395,8 +395,10 @@ static void _RHZoneIntrospectionEnumeratorFindInstancesCallback(task_t task, voi
             CFArrayRemoveAllValues(context->results);
         }
         
+        void *matchedInstance = (void *)range->address;
+
         //add to results
-        CFArrayAppendValue(context->results, data);
+        CFArrayAppendValue(context->results, matchedInstance);
         
         //if FirstMatch; cancel the remainder of our processing
         if (OPTION_ENABLED(context->options, RHBeagleFindOptionFirstMatch)){
