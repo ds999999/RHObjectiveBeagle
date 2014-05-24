@@ -145,7 +145,7 @@ To include Beagle via CocoaPods add `pod 'RHObjectiveBeagle', :git => 'https://g
 Beagle is debugging tool and therefore is only meant to be used for debugging.  
 If you need to debug a production build, you can always [load](#load) libBeagle.dylib into the process at runtime.
 
-* It's probably not a good idea to ship it in your production builds.
+* It's probably not a good idea to ship it in your production builds (see GPLv3).
 * Please don't write code that uses it explicitly.
 * **Whatever you do, NEVER use it in place of a singleton!**
 
@@ -229,13 +229,13 @@ cp libBeagle.dylib ~/Library/Containers/<app.bundle.id>/Data/
 ```
 
 ## Inspiration, credits & similar projects
-The initial usefulness of such a debugging aid was brought to my attention by [Cycript](http://www.cycript.org) while debugging 3rd party applications earlier in 2014.
+The initial inspiration for such a tool came via usage of [Cycript](http://www.cycript.org) to debug 3rd party applications earlier in the year.
   
 Initial research into how to implement such a feature came from [heap_find.c](http://llvm.org/viewvc/llvm-project/lldb/trunk/examples/darwin/heap_find/heap_find.c?view=markup&pathrev=148523) and via way of other similar implementations including [Cycript](http://www.cycript.org) and the [lldb-commits](http://lists.cs.uiuc.edu/pipermail/lldb-commits/Week-of-Mon-20120116/004775.html) mailing list.
 
 Specific class sanity checks were inspired by similar class instance checks found in [Cycript.org](http://gitweb.saurik.com/cycript.git/blob/HEAD:/ObjectiveC/Library.mm) and [heap_find.c](http://llvm.org/viewvc/llvm-project/lldb/trunk/examples/darwin/heap_find/heap_find.c?view=markup&pathrev=148523).
 
-Cycript itself is a really powerful debugging aid and deserves mention both as a source of inspiration and for all the amazing things that it's capable of doing. It makes use of [Webkit's JSC](https://trac.webkit.org/wiki/JSC) and allows for direct runtime introspection of a running application via a JavaScript console. Cycript by [saurik](https://twitter.com/saurik) can be found at [cycript.org](http://www.cycript.org).
+Cycript itself is a really powerful debugging aid and deserves its own mention both as a source of inspiration and for all the amazing things that it's capable of doing. Cycript makes use of [Webkit's JSC](https://trac.webkit.org/wiki/JSC) and allows for direct runtime introspection of an application via a JavaScript console. Cycript by [saurik](https://twitter.com/saurik) can be found at [cycript.org](http://www.cycript.org).
 
 Inspiration also comes via way of a useful lldb [heap search feature](https://github.com/llvm-mirror/lldb/blob/master/examples/darwin/heap_find/heap/heap_find.cpp) implemented by the lldb project  for strings and other various objects and exposed via the lldb script 'lldb.macosx.heap' available via `command script import lldb.macosx.heap` and `ptr_refs --help`.
 
@@ -260,34 +260,32 @@ To fix this error, we have to manually edit some Xcode files to add the dynamic 
 Also, note that libBeagle-ios is actually lipo'd together from the -iphoneos and -iphonesimulator targets.
 
 ## Licence
-Released under the Modified BSD License. 
-(Attribution Required)
-<pre>
-RHObjectiveBeagle
+Released under the GNU General Public License, Version 3. 
 
+<pre>
+
+RHObjectiveBeagle
 Copyright (c) 2014 Richard Heard. All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
-1. Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-2. Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
-3. The name of the author may not be used to endorse or promote products
-derived from this software without specific prior written permission.
+Portions of this software are derivative works of Cycript.
+Copyright (c) 2009-2014 Jay Freeman (saurik).
 
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+GNU General Public License, Version 3
+
+RHObjectiveBeagle is free software: you can redistribute
+it and/or modify it under the terms of the GNU General Public
+License as published by the Free Software Foundation, either
+version 3 of the License, or (at your option) any later version.
+
+RHObjectiveBeagle is distributed in the hope that it will be 
+useful, but WITHOUT ANY WARRANTY; without even the implied 
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with RHObjectiveBeagle.  If not, see <http://www.gnu.org/licenses/>.
+
+
 </pre>
 
 
