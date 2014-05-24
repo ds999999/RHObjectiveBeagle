@@ -300,7 +300,7 @@ static void _RHZoneIntrospectionEnumeratorFindInstancesCallback(task_t task, voi
         size_t size = range->size;
         
         //make sure range is big enough to contain an an instance of an object
-        if (size < sizeof(class_getInstanceSize([_RHObjectStandin class]))){
+        if (size < class_getInstanceSize([_RHObjectStandin class])){
             continue;
         }
         
@@ -313,7 +313,7 @@ static void _RHZoneIntrospectionEnumeratorFindInstancesCallback(task_t task, voi
         extern uint64_t objc_debug_isa_class_mask WEAK_IMPORT_ATTRIBUTE;
 
         uint64_t taggedPointerMask;
-        if (objc_debug_isa_class_mask != 0x0){
+        if (objc_debug_isa_class_mask == 0x0){
             //fall back to 0x00000001fffffff8 as of 19th May 2014; Not ABI stable..
             taggedPointerMask = 0x00000001fffffff8;
         } else {
