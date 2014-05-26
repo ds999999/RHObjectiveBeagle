@@ -136,16 +136,19 @@ These operate in the same way as the above method definitions.
 
 
 ## Adding Beagle to your project
-The easiest way to add Beagle to your project will likely be by adding `RHObjectiveBeagle.h` and `RHObjectiveBeagle.m` to your project.
+[Objective Beagle Loader](http://github.com/heardrwt/RHObjectiveBeagleLoader) is the preferred way to include Beagle in a project.
 
-To include Beagle via CocoaPods add `pod 'RHObjectiveBeagle', :git => 'https://github.com/heardrwt/RHObjectiveBeagle.git'` to your Podfile.
+The short version is to add `RHObjectiveBeagleLoader.m` to your project. You can find it [here](http://github.com/heardrwt/RHObjectiveBeagleLoader).
+
+To include Beagle via CocoaPods add `pod 'RHObjectiveBeagleLoader', :git => 'https://github.com/heardrwt/RHObjectiveBeagleLoader.git'` to your Podfile.
+
 
 
 ## Use it for debugging purposes only
 Beagle is debugging tool and therefore is only meant to be used for debugging.  
 If you need to debug a production build, you can always [load](#load) libBeagle.dylib into the process at runtime.
 
-* It's probably not a good idea to ship it in your production builds (see GPLv3).
+* It's not a good idea to ship it in your production builds.
 * Please don't write code that uses it explicitly.
 * **Whatever you do, NEVER use it in place of a singleton!**
 
