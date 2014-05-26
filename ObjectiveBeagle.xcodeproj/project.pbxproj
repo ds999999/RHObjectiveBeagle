@@ -11,7 +11,7 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 13495476192CB59C00B9C569 /* Build configuration list for PBXAggregateTarget "libBeagle-ios" */;
 			buildPhases = (
-				13495475192CB59C00B9C569 /* lipo */,
+				13495475192CB59C00B9C569 /* lipo and codesign */,
 			);
 			dependencies = (
 				13495471192CB59C00B9C569 /* PBXTargetDependency */,
@@ -279,19 +279,19 @@
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		13495475192CB59C00B9C569 /* lipo */ = {
+		13495475192CB59C00B9C569 /* lipo and codesign */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = lipo;
+			name = "lipo and codesign";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd $BUILT_PRODUCTS_DIR\n\nlipo -create libBeagle-iphoneos.dylib libBeagle-iphonesimulator.dylib -output libBeagle-ios.dylib\n\nrm libBeagle-iphoneos.dylib\nrm libBeagle-iphonesimulator.dylib\nopen .";
+			shellScript = "cd $BUILT_PRODUCTS_DIR\n\nlipo -create libBeagle-iphoneos.dylib libBeagle-iphonesimulator.dylib -output libBeagle-ios.dylib\n\nrm libBeagle-iphoneos.dylib\nrm libBeagle-iphonesimulator.dylib\ncodesign -s \"$CODE_SIGN_IDENTITY\" libBeagle-ios.dylib\n\nopen .";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -349,6 +349,7 @@
 		13495477192CB59C00B9C569 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer: Richard Heard (6";
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				PRODUCT_NAME = "libBeagle-ios";
 				SDKROOT = iphoneos;
@@ -358,6 +359,7 @@
 		13495478192CB59C00B9C569 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer: Richard Heard (6";
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				PRODUCT_NAME = "libBeagle-ios";
 				SDKROOT = iphoneos;
